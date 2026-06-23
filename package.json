@@ -1,23 +1,44 @@
 {
-  "name": "scaffold",
+  "name": "kd-social-analytics",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "node --env-file=.env --import tsx scripts/seed.mts"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^1.11.2",
+    "@react-pdf/renderer": "^4.5.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "drizzle-orm": "^0.45.2",
+    "exceljs": "^4.4.0",
+    "lucide-react": "^1.21.0",
     "next": "16.2.9",
+    "next-auth": "^5.0.0-beta.31",
+    "papaparse": "^5.5.4",
+    "postgres": "^3.4.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/papaparse": "^5.5.2",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
