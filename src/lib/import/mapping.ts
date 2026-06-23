@@ -22,7 +22,16 @@ import {
 // "starts with", then "contains" (all on normalized lowercase headers).
 const POST_SYNONYMS: Record<PostField, string[]> = {
   postId: ["post id", "video id", "media id", "content id", "id"],
-  caption: ["video title", "post title", "title", "caption", "description"],
+  caption: [
+    "video title",
+    "post title",
+    "title",
+    "caption",
+    "description",
+    "post text",
+    "tweet text",
+    "text",
+  ],
   url: ["permalink", "url", "video link", "share url", "link"],
   publishedAt: [
     "video publish time",

@@ -88,6 +88,7 @@ export interface PlatformOverview {
   views: number;
   engagement: number;
   followers: number;
+  followerChange: number;
 }
 
 /**
@@ -124,11 +125,12 @@ export async function getOverview(
     GROUP BY la.platform
   `);
 
-  // Account-level daily views/engagement summed over the window (per platform).
+  // Account-level daily metrics summed over the window (per platform).
   const acctRows = await db.execute<Record<string, unknown>>(sql`
     SELECT la.platform,
            COALESCE(SUM(amd.views), 0) AS views,
-           COALESCE(SUM(amd.engagement), 0) AS engagement
+           COALESCE(SUM(amd.engagement), 0) AS engagement,
+           COALESCE(SUM(amd.follower_change), 0) AS follower_change
     FROM linked_accounts la
     JOIN account_metrics_daily amd ON amd.linked_account_id = la.id
     WHERE la.workspace_id = ${workspaceId} AND amd.date >= ${sinceStr}
@@ -158,12 +160,20 @@ export async function getOverview(
       views: Number(r.views),
       engagement: Number(r.engagement),
       followers: 0,
+      followerChange: 0,
     });
   }
   const ensure = (p: Platform): PlatformOverview => {
     let existing = byPlatform.get(p);
     if (!existing) {
-      existing = { platform: p, posts: 0, views: 0, engagement: 0, followers: 0 };
+      existing = {
+        platform: p,
+        posts: 0,
+        views: 0,
+        engagement: 0,
+        followers: 0,
+        followerChange: 0,
+      };
       byPlatform.set(p, existing);
     }
     return existing;
@@ -173,6 +183,7 @@ export async function getOverview(
     const o = ensure(r.platform as Platform);
     o.views += Number(r.views);
     o.engagement += Number(r.engagement);
+    o.followerChange += Number(r.follower_change);
   }
   for (const r of followerRows as unknown as Record<string, unknown>[]) {
     ensure(r.platform as Platform).followers = Number(r.followers);
@@ -185,6 +196,7 @@ export interface TrendPoint {
   date: string;
   followers: number;
   views: number;
+  engagement: number;
 }
 
 /** Daily account-level trend across a workspace's accounts, for the overview chart. */
@@ -198,7 +210,8 @@ export async function getTrend(
   const rows = await db.execute<Record<string, unknown>>(sql`
     SELECT amd.date,
            COALESCE(SUM(amd.followers), 0) AS followers,
-           COALESCE(SUM(amd.views), 0) AS views
+           COALESCE(SUM(amd.views), 0) AS views,
+           COALESCE(SUM(amd.engagement), 0) AS engagement
     FROM account_metrics_daily amd
     JOIN linked_accounts la ON la.id = amd.linked_account_id
     WHERE amd.date >= ${since.toISOString().slice(0, 10)}
@@ -211,5 +224,6 @@ export async function getTrend(
     date: String(r.date),
     followers: Number(r.followers),
     views: Number(r.views),
+    engagement: Number(r.engagement),
   }));
 }

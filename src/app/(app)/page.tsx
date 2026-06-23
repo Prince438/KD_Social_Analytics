@@ -46,8 +46,9 @@ export default async function DashboardPage({
       views: acc.views + o.views,
       engagement: acc.engagement + o.engagement,
       posts: acc.posts + o.posts,
+      followerChange: acc.followerChange + o.followerChange,
     }),
-    { followers: 0, views: 0, engagement: 0, posts: 0 },
+    { followers: 0, views: 0, engagement: 0, posts: 0, followerChange: 0 },
   );
 
   const hasData = overview.length > 0;
@@ -77,8 +78,15 @@ export default async function DashboardPage({
         <>
           <DashboardControls range={range} metric={metric} />
 
-          <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             <StatCard label="Followers" value={formatCompact(totals.followers)} />
+            <StatCard
+              label="New follows"
+              value={`${totals.followerChange >= 0 ? "+" : ""}${formatCompact(
+                totals.followerChange,
+              )}`}
+              sub={`last ${range} days`}
+            />
             <StatCard label="Views" value={formatCompact(totals.views)} />
             <StatCard label="Engagement" value={formatCompact(totals.engagement)} />
             <StatCard label="Posts" value={formatCompact(totals.posts)} />
@@ -97,10 +105,7 @@ export default async function DashboardPage({
               </h2>
               <ul className="space-y-3">
                 {overview.map((o) => (
-                  <li
-                    key={o.platform}
-                    className="flex items-center justify-between text-sm"
-                  >
+                  <li key={o.platform} className="flex items-center justify-between text-sm">
                     <span className="flex items-center gap-2">
                       <span
                         className="inline-block h-2.5 w-2.5 rounded-full"
@@ -108,8 +113,11 @@ export default async function DashboardPage({
                       />
                       {PLATFORM_META[o.platform].label}
                     </span>
-                    <span className="text-neutral-500">
+                    <span className="text-right text-neutral-500">
                       {formatCompact(o.views)} views
+                      <span className="ml-2 text-neutral-400">
+                        {formatCompact(o.engagement)} eng.
+                      </span>
                     </span>
                   </li>
                 ))}
