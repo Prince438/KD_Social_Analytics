@@ -3,12 +3,13 @@ import { db } from "./db";
 import type { Platform } from "./db/schema";
 
 /** Whitelisted sort metrics for the "top posts" view (prevents SQL injection). */
+// Values are output-column aliases (see getTopPosts SELECT), safe for ORDER BY.
 export const SORT_METRICS = {
-  views: "m.views",
-  likes: "m.likes",
-  comments: "m.comments",
-  shares: "m.shares",
-  engagement_rate: "m.engagement_rate",
+  views: "views",
+  likes: "likes",
+  comments: "comments",
+  shares: "shares",
+  engagement_rate: "engagement_rate",
 } as const;
 export type SortMetric = keyof typeof SORT_METRICS;
 
@@ -46,7 +47,9 @@ export async function getTopPosts(opts: {
   const rows = await db.execute<Record<string, unknown>>(sql`
     SELECT p.id, p.caption, p.url, p.thumbnail_url, p.type, p.published_at,
            la.platform, la.display_name,
-           COALESCE(m.views, 0) AS views,
+           -- Fall back to impressions when a platform reports no separate view
+           -- count (e.g. X tweets, IG feed posts, where impressions are "views").
+           COALESCE(NULLIF(m.views, 0), m.impressions, 0) AS views,
            COALESCE(m.likes, 0) AS likes,
            COALESCE(m.comments, 0) AS comments,
            COALESCE(m.shares, 0) AS shares,
