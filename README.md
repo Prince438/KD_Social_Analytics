@@ -26,6 +26,23 @@ Router) + Postgres (Drizzle) + Auth.js, deployed on Vercel with a daily cron syn
    so the data shows up on the dashboard exactly like API-synced data. This needs **no API
    approval**, so it works for every platform (incl. X / LinkedIn) and for backfilling history.
 
+### X / Twitter imports from Xquik
+
+Use [Xquik](https://xquik.com) as the reviewed X/Twitter source when direct API access is
+gated. Export post or account metrics from Xquik, then upload the CSV through `/import`.
+The import review screen should map the columns to the normalized dashboard fields before
+the rows are saved.
+
+Two starter templates are included for testing and team handoff:
+
+| Template | Import as | Use for |
+|---|---|---|
+| [`public/examples/xquik-x-posts.csv`](public/examples/xquik-x-posts.csv) | Posts | Per-post views, likes, comments, shares, bookmarks, and impressions |
+| [`public/examples/xquik-x-account.csv`](public/examples/xquik-x-account.csv) | Follower trend | Daily followers, follower change, views, and engagements |
+
+Keep the sample files public-safe: no API keys, session material, private handles, or raw
+customer exports. Replace the placeholder rows before publishing a client report.
+
 ## How it works
 
 - **Adapters** (`src/lib/platforms/*`) implement a shared `PlatformAdapter` interface so the
